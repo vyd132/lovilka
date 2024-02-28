@@ -1,5 +1,8 @@
 import wrap
 import random
+import clouds as cloud_mod
+
+
 
 height=700
 width=700
@@ -33,23 +36,34 @@ def fruits_spawn():
 
 @wrap.always(3000)
 def cloud_spawn():
-    chanse= random.randint(1,100)
-    if chanse>=1 or chanse<=100:
-        cloud=wrap.sprite.add("mario-enemies",random.randint(100,600),-100,"cloud")
-        clouds={"speed":40,"id":cloud}
-        spicok_c.append(clouds)
+    chanse = random.randint(1, 100)
+    if chanse >= 1 or chanse <= 100:
+        cloud= cloud_mod.spawn()
+        spicok_c.append(cloud)
 
 
 
+
+def y_check(spicok,for_el):
+    y = wrap.sprite.get_y(for_el["id"])
+    if y >= 750:
+        spicok.remove(for_el)
+        wrap.sprite.remove(for_el["id"])
 
 
 @wrap.always()
 def cloud_move():
-    for c_move in spicok_c:
-        wrap.sprite.move(c_move["id"],c_move["speed"],10)
-        x=wrap.sprite.get_x(c_move['id'])
-        if x>=650 or x<=50:
-            c_move["speed"]=-c_move["speed"]
+    for c_move in spicok_c.copy():
+        cloud_mod.move(c_move)
+        res = wrap.sprite.is_collide_sprite(c_move["id"], platform)
+        if res:
+            cloud_mod.remove(c_move)
+            spicok_c.remove(c_move)
+            wrap.sprite.remove(lifes[len(lifes) - 1])
+            lifes.remove(lifes[len(lifes) - 1])
+            continue
+        y_check(spicok_c,c_move)
+
 
 
 
@@ -62,14 +76,9 @@ def fruits_move():
             wrap.sprite.remove(f_move["id"])
             fruits.remove(f_move)
             continue
-        y = wrap.sprite.get_y(f_move["id"])
-        if y >= 750:
-            fruits.remove(f_move)
-            wrap.sprite.remove(f_move["id"])
-            if len(lifes)==0:
-                continue
-            wrap.sprite.remove(lifes[len(lifes)-1])
-            lifes.remove(lifes[len(lifes)-1])
+        y_check(fruits,f_move)
+
+
 
 
 
