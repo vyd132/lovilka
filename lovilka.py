@@ -1,6 +1,7 @@
 import wrap
 import random
-import clouds as cloud_mod
+import clouds as cloud_mod, fruits as fruit_mod, lifes as life_mod
+
 
 
 
@@ -9,7 +10,6 @@ width=700
 wrap.world.create_world(width, height)
 
 fruits=[]
-lifes=[]
 clouds=[]
 spicok_c=[]
 
@@ -21,17 +21,15 @@ platform = wrap.sprite.add("mario-items", 30, 600, "moving_platform1")
 
 
 
-for life in range(0,96,32):
-    platform_lives= wrap.sprite.add("mario-items", 650, 50+life, "moving_platform1")
-    lifes.append(platform_lives)
+life=life_mod.spawn()
+
+
 
 
 @wrap.always(1000)
 def fruits_spawn():
-    straw=wrap.sprite.add("pacman",random.randint(100,600),-100,random.choice(["item_strawberry","item_apple","item_cherry"]))
-    strawberry = {"speed": random.randint(10,50)}
-    strawberry["id"]=straw
-    fruits.append(strawberry)
+    straw=fruit_mod.spawn()
+    fruits.append(straw)
     print(fruits)
 
 @wrap.always(3000)
@@ -44,11 +42,12 @@ def cloud_spawn():
 
 
 
-def y_check(spicok,for_el):
+def y_check(spicok,for_el,comand):
     y = wrap.sprite.get_y(for_el["id"])
-    if y >= 750:
+    if y >= 600:
         spicok.remove(for_el)
-        wrap.sprite.remove(for_el["id"])
+        comand.remove(for_el)
+
 
 
 @wrap.always()
@@ -59,10 +58,9 @@ def cloud_move():
         if res:
             cloud_mod.remove(c_move)
             spicok_c.remove(c_move)
-            wrap.sprite.remove(lifes[len(lifes) - 1])
-            lifes.remove(lifes[len(lifes) - 1])
+            life_mod.remove()
             continue
-        y_check(spicok_c,c_move)
+        y_check(spicok_c,c_move,cloud_mod)
 
 
 
@@ -70,15 +68,13 @@ def cloud_move():
 @wrap.always()
 def fruits_move():
     for f_move in fruits.copy():
-        wrap.sprite.move(f_move["id"],0,f_move["speed"])
+        fruit_mod.move(f_move)
         res = wrap.sprite.is_collide_sprite(f_move["id"], platform)
         if res:
-            wrap.sprite.remove(f_move["id"])
+            fruit_mod.remove(f_move)
             fruits.remove(f_move)
             continue
-        y_check(fruits,f_move)
-
-
+        y_check(fruits,f_move,fruit_mod)
 
 
 
