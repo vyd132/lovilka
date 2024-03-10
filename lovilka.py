@@ -1,6 +1,6 @@
 import wrap
 import random
-import clouds as cloud_mod, fruits as fruit_mod, lifes as life_mod
+import clouds as cloud_mod, fruits as fruit_mod, lifes as life_mod, armadillo as arm_mod
 
 
 
@@ -12,7 +12,7 @@ wrap.world.create_world(width, height)
 fruits=[]
 clouds=[]
 spicok_c=[]
-
+armadillo=[]
 
 
 platform = wrap.sprite.add("mario-items", 30, 600, "moving_platform1")
@@ -30,7 +30,9 @@ life=life_mod.spawn()
 def fruits_spawn():
     straw=fruit_mod.spawn()
     fruits.append(straw)
-    print(fruits)
+
+
+
 
 @wrap.always(3000)
 def cloud_spawn():
@@ -38,6 +40,15 @@ def cloud_spawn():
     if chanse >= 1 or chanse <= 100:
         cloud= cloud_mod.spawn()
         spicok_c.append(cloud)
+
+
+@wrap.always(1000)
+def arm_spawn():
+    for clouds_cord in spicok_c:
+        arm=arm_mod.spawn(wrap.sprite.get_x(clouds_cord["id"]),wrap.sprite.get_y(clouds_cord["id"]))
+        if arm==None:
+            return
+        armadillo.append(arm)
 
 
 
@@ -77,6 +88,16 @@ def fruits_move():
         y_check(fruits,f_move,fruit_mod)
 
 
+@wrap.always()
+def arm_move():
+    for armadillo_move in armadillo.copy():
+        arm_mod.move(armadillo_move)
+        res = wrap.sprite.is_collide_sprite(armadillo_move["id"], platform)
+        if res:
+            arm_mod.remove(armadillo_move)
+            armadillo.remove(armadillo_move)
+            continue
+        y_check(armadillo,armadillo_move,arm_mod)
 
 @wrap.on_mouse_move
 def platform_move(pos_x):
